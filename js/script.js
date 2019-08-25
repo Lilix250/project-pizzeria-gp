@@ -62,9 +62,10 @@
       thisProduct.data = data;
       
       thisProduct.renderInMenu();
+      thisProduct.getElements();
       thisProduct.initAccordion();
-      
-      console.log('newProduct', thisProduct);
+      thisProduct.initOrderForm();
+      thisProduct.processOrder();
     }
     renderInMenu(){
       const thisProduct = this;
@@ -74,10 +75,20 @@
       const menuContainer = document.querySelector(select.containerOf.menu);
       menuContainer.appendChild(thisProduct.element);
     }
+    
+    getElements(){
+      const thisProduct = this;
+    
+      thisProduct.accordionTrigger = thisProduct.element.querySelector(select.menuProduct.clickable);
+      thisProduct.form = thisProduct.element.querySelector(select.menuProduct.form);
+      thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
+      thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
+      thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+    }
+    
     initAccordion(){
       const thisProduct = this;
-      const clickTrigger = thisProduct.element;
-      clickTrigger.addEventListener('click', function(event) {
+      thisProduct.accordionTrigger.addEventListener('click', function(event) {
         event.preventDefault();
         thisProduct.element.classList.add('active');
         const activeProducts = document.querySelectorAll(select.all.menuProductsActive);
@@ -88,6 +99,57 @@
         }
       });
     
+    }
+
+    initOrderForm(){
+      const thisProduct = this;
+    }
+
+    processOrder(){
+      const thisProduct = this;
+      thisProduct.form.addEventListener('submit', function(event){
+        event.preventDefault();
+        thisProduct.processOrder();
+      });
+      
+      for(let input of thisProduct.formInputs){
+        input.addEventListener('change', function(){
+          thisProduct.processOrder();
+        });
+      }
+      
+      thisProduct.cartButton.addEventListener('click', function(event){
+        event.preventDefault();
+        thisProduct.processOrder();
+      });
+      
+      const formData = utils.serializeFormToObject(thisProduct.form);
+
+      let price = thisProduct.data.price;
+
+      const allProducts = dataSource.products;
+      if (allProducts[thisProduct.id].params){
+        const ingredientParams = allProducts[thisProduct.id].params;
+        for (let ingredientParamKey in ingredientParams){
+          const ingredientOptions = ingredientParams[ingredientParamKey].options;
+          for (let key in ingredientOptions){
+            if (formData[ingredientParamKey]) {
+              let selectedIngredient = false; 
+              for(let ingredient of formData[ingredientParamKey]){
+                if (key == ingredient){
+                  selectedIngredient = true;
+                }
+              }
+              if (selectedIngredient == true && !ingredientOptions[key].default){
+                price += ingredientOptions[key].price;
+              } else if (selectedIngredient == false && ingredientOptions[key].default == true){
+                price -= ingredientOptions[key].price;
+              }
+            }
+          }            
+        }
+      }
+      console.log('final price', price);
     }
   }
   
@@ -126,8 +188,5 @@
     },
   };
 
-
   app.init();
 }
-
-
