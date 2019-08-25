@@ -84,6 +84,7 @@
       thisProduct.formInputs = thisProduct.form.querySelectorAll(select.all.formInputs);
       thisProduct.cartButton = thisProduct.element.querySelector(select.menuProduct.cartButton);
       thisProduct.priceElem = thisProduct.element.querySelector(select.menuProduct.priceElem);
+      thisProduct.imageWrapper = thisProduct.element.querySelector(select.menuProduct.imageWrapper);
     }
     
     initAccordion(){
@@ -103,10 +104,7 @@
 
     initOrderForm(){
       const thisProduct = this;
-    }
 
-    processOrder(){
-      const thisProduct = this;
       thisProduct.form.addEventListener('submit', function(event){
         event.preventDefault();
         thisProduct.processOrder();
@@ -122,6 +120,10 @@
         event.preventDefault();
         thisProduct.processOrder();
       });
+    }
+
+    processOrder(){
+      const thisProduct = this;
       
       const formData = utils.serializeFormToObject(thisProduct.form);
 
@@ -144,6 +146,12 @@
                 price += ingredientOptions[key].price;
               } else if (selectedIngredient == false && ingredientOptions[key].default == true){
                 price -= ingredientOptions[key].price;
+              }
+              const img = thisProduct.imageWrapper.querySelector('.' + ingredientParamKey + '-' + key);
+              if (img && selectedIngredient == true){
+                img.classList.add(classNames.menuProduct.imageVisible);
+              } else if (img) {
+                img.classList.remove(classNames.menuProduct.imageVisible);
               }
             }
           }            
