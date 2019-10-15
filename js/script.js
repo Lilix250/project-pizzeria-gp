@@ -178,8 +178,8 @@
       let price = thisProduct.data.price;
 
       const allProducts = app.data.products;
-      const product = allProducts.find(function (prod) { return prod.id = thisProduct.id; });
-      if (product.params){
+      const product = allProducts.find(function (prod) { return prod.id === thisProduct.id; });
+      if (product && product.params){
         const ingredientParams = product.params;
         for (let ingredientParamKey in ingredientParams){
           const ingredientOptions = ingredientParams[ingredientParamKey].options;
@@ -365,7 +365,6 @@
     remove(cartProduct){
       const thisCart = this;
       const index = thisCart.products.indexOf(cartProduct);
-      console.log('cartProduct.dom.wrapper', cartProduct.dom.wrapper);
       thisCart.products.splice(index, 1);
 
       cartProduct.dom.wrapper.remove();
@@ -489,7 +488,6 @@
 
     initActions() {
       const thisCartProduct = this;
-      console.log('thisCartProduct', thisCartProduct);
       const editBtn = thisCartProduct.dom.wrapper.querySelector(thisCartProduct.dom.edit);
       editBtn.addEventListener('click', function(event) {
         event.preventDefault();
